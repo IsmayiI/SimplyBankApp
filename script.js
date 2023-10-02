@@ -1,6 +1,6 @@
 'use strict';
 
-// Simply Bank App
+// =========================================== Simply Bank App
 
 const account1 = {
    userName: 'Cecil Ireland',
@@ -39,7 +39,8 @@ const account5 = {
 
 const accounts = [account1, account2, account3, account4, account5];
 
-// Elements
+// =========================================== Elements
+
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
 const labelBalance = document.querySelector('.balance__value');
@@ -65,6 +66,8 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+// =========================================== Functions
+
 
 const displayTransactions = (transactions) => {
    containerTransactions.innerHTML = ''
@@ -85,4 +88,31 @@ const displayTransactions = (transactions) => {
    })
 }
 
+const displayBalance = (transactions) => {
+   const balance = transactions.reduce((sum, trans) => sum += trans, 0)
+   labelBalance.textContent = `${balance}$`
+}
+
+const firstLetters = (str) => {
+   return str.toLowerCase()
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+}
+
+const createNicknames = (arr) => {
+   arr.forEach((obj) => {
+      obj.nickname = firstLetters(obj.userName)
+   })
+}
+
+// =========================================== Code
+
+createNicknames(accounts)
+
+
 displayTransactions(account1.transactions)
+displayBalance(account1.transactions)
+
+
+
