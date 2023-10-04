@@ -291,3 +291,11 @@ h2 {
 .timer {
    font-weight: 600;
 }
+
+.transactions__value_deposit {
+   color: #1acc38
+}
+
+.transactions__value_withdrawal {
+   color: #f51919
+}

@@ -80,7 +80,7 @@ const displayTransactions = (transactions) => {
           <div class="transactions__type transactions__type--${transTypeClass}">
             ${++i} ${transTypeString}
           </div>
-          <div class="transactions__value">${trans}$</div>
+          <div class="transactions__value transactions__value_${transTypeClass}">${Math.abs(trans)}$</div>
         </div>
       `
 
@@ -91,6 +91,22 @@ const displayTransactions = (transactions) => {
 const displayBalance = (transactions) => {
    const balance = transactions.reduce((sum, trans) => sum += trans, 0)
    labelBalance.textContent = `${balance}$`
+}
+
+const displayTotalValue = (transactions, interest) => {
+   const depositTotal = transactions.filter(trans => trans > 0)
+      .reduce((sum, trans) => sum + trans, 0)
+   const withdrawalTotal = transactions.filter(trans => trans < 0)
+      .reduce((sum, trans) => sum + trans, 0)
+   const interestTotal = transactions.filter(trans => trans > 0)
+      .map(trans => (trans * interest) / 100)
+      .filter(int => int >= 5)
+      .reduce((sum, int) => sum + int, 0)
+
+
+   labelSumIn.textContent = depositTotal + '$'
+   labelSumOut.textContent = Math.abs(withdrawalTotal) + '$'
+   labelSumInterest.textContent = interestTotal + '$'
 }
 
 const firstLetters = (str) => {
@@ -113,6 +129,7 @@ createNicknames(accounts)
 
 displayTransactions(account1.transactions)
 displayBalance(account1.transactions)
+displayTotalValue(account1.transactions, account1.interest)
 
 
 
