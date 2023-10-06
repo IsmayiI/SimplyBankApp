@@ -131,16 +131,10 @@ const createNicknames = (arr) => {
    })
 }
 
-const resetUserData = () => {
-   inputLoginUsername.value = ''
-   inputLoginPin.value = ''
-   inputLoginPin.blur()
-}
-
-const resetTransferData = () => {
-   inputTransferAmount.value = ''
-   inputTransferTo.value = ''
-   inputTransferAmount.blur()
+const resetData = (input1, input2) => {
+   input1.value = ''
+   input2.value = ''
+   input2.blur()
 }
 
 const displayAccount = () => {
@@ -154,7 +148,7 @@ const displayAccount = () => {
 const displayUserAccount = () => {
    account = accounts.find(({ nickname, pin }) =>
       inputLoginUsername.value.trim() === nickname && +inputLoginPin.value === pin)
-   resetUserData()
+   resetData(inputLoginUsername, inputLoginPin)
    if (account) {
       displayAccount()
    } else {
@@ -174,7 +168,17 @@ const transferToAccount = () => {
 
 
    }
-   resetTransferData()
+   resetData(inputTransferTo, inputTransferAmount)
+}
+
+const closeAccount = () => {
+   const { nickname, pin } = account
+   if (inputCloseUsername.value.trim() === nickname && +inputClosePin.value === pin) {
+      const deleteAccountIndex = accounts.findIndex(obj => obj.nickname === nickname && obj.pin === pin)
+      accounts.splice(deleteAccountIndex, 1)
+      displayUI()
+   }
+   resetData(inputCloseUsername, inputClosePin)
 }
 
 // =========================================== Code
@@ -193,6 +197,11 @@ btnTransfer.addEventListener('click', (e) => {
    transferToAccount()
 })
 
+
+btnClose.addEventListener('click', (e) => {
+   e.preventDefault()
+   closeAccount()
+})
 
 
 
