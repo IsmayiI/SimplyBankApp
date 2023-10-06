@@ -181,6 +181,15 @@ const closeAccount = () => {
    resetData(inputCloseUsername, inputClosePin)
 }
 
+const addLoan = () => {
+   const loanAmount = +inputLoanAmount.value
+   if (loanAmount > 0 && account.transactions.some(trans => trans >= (loanAmount * 10) / 100)) {
+      account.transactions.push(loanAmount)
+      displayAccount()
+   }
+   resetData(inputLoanAmount, inputLoanAmount)
+}
+
 // =========================================== Code
 
 createNicknames(accounts)
@@ -202,6 +211,13 @@ btnClose.addEventListener('click', (e) => {
    e.preventDefault()
    closeAccount()
 })
+
+btnLoan.addEventListener('click', (e) => {
+   e.preventDefault()
+   addLoan()
+})
+
+
 
 
 
