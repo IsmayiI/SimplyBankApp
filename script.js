@@ -94,6 +94,7 @@ const displayTransactions = (transactions) => {
 const displayBalance = (transactions) => {
    const balance = transactions.reduce((sum, trans) => sum += trans, 0)
    labelBalance.textContent = `${balance}$`
+   account.balance = balance
 }
 
 const displayTotalValue = (transactions, interest) => {
@@ -136,19 +137,44 @@ const resetUserData = () => {
    inputLoginPin.blur()
 }
 
+const resetTransferData = () => {
+   inputTransferAmount.value = ''
+   inputTransferTo.value = ''
+   inputTransferAmount.blur()
+}
+
+const displayAccount = () => {
+   const { transactions, interest, userName } = account
+   displayTransactions(transactions)
+   displayBalance(transactions)
+   displayTotalValue(transactions, interest)
+   displayUI(userName, 1)
+}
+
 const displayUserAccount = () => {
    account = accounts.find(({ nickname, pin }) =>
       inputLoginUsername.value.trim() === nickname && +inputLoginPin.value === pin)
    resetUserData()
    if (account) {
-      const { transactions, interest, userName } = account
-      displayTransactions(transactions)
-      displayBalance(transactions)
-      displayTotalValue(transactions, interest)
-      displayUI(userName, 1)
+      displayAccount()
    } else {
       displayUI()
    }
+}
+
+const transferToAccount = () => {
+   const accForTransfer = accounts.find(({ nickname }) => inputTransferTo.value.trim() === nickname)
+   if (accForTransfer
+      && +inputTransferAmount.value > 0
+      && +inputTransferAmount.value <= account.balance
+      && accForTransfer.nickname !== account.nickname) {
+      accForTransfer.transactions.push(+inputTransferAmount.value)
+      account.transactions.push(-(+inputTransferAmount.value))
+      displayAccount()
+
+
+   }
+   resetTransferData()
 }
 
 // =========================================== Code
@@ -161,6 +187,13 @@ btnLogin.addEventListener('click', (e) => {
    e.preventDefault()
    displayUserAccount()
 })
+
+btnTransfer.addEventListener('click', (e) => {
+   e.preventDefault()
+   transferToAccount()
+})
+
+
 
 
 
