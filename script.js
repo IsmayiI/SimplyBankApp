@@ -66,6 +66,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
+const enterText = 'Войдите в свой аккаунт'
+let account;
+
 // =========================================== Functions
 
 
@@ -109,6 +112,11 @@ const displayTotalValue = (transactions, interest) => {
    labelSumInterest.textContent = interestTotal + '$'
 }
 
+const displayUI = (text = enterText, opacity = 0) => {
+   labelWelcome.textContent = text
+   containerApp.style.opacity = opacity
+}
+
 const firstLetters = (str) => {
    return str.toLowerCase()
       .split(' ')
@@ -122,14 +130,37 @@ const createNicknames = (arr) => {
    })
 }
 
+const resetUserData = () => {
+   inputLoginUsername.value = ''
+   inputLoginPin.value = ''
+   inputLoginPin.blur()
+}
+
+const displayUserAccount = () => {
+   account = accounts.find(({ nickname, pin }) =>
+      inputLoginUsername.value.trim() === nickname && +inputLoginPin.value === pin)
+   resetUserData()
+   if (account) {
+      const { transactions, interest, userName } = account
+      displayTransactions(transactions)
+      displayBalance(transactions)
+      displayTotalValue(transactions, interest)
+      displayUI(userName, 1)
+   } else {
+      displayUI()
+   }
+}
+
 // =========================================== Code
 
 createNicknames(accounts)
 
+// =========================================== Events
 
-displayTransactions(account1.transactions)
-displayBalance(account1.transactions)
-displayTotalValue(account1.transactions, account1.interest)
+btnLogin.addEventListener('click', (e) => {
+   e.preventDefault()
+   displayUserAccount()
+})
 
 
 
