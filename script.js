@@ -37,7 +37,10 @@ const account5 = {
    pin: 5555,
 };
 
-const accounts = [account1, account2, account3, account4, account5];
+const enterText = 'Войдите в свой аккаунт'
+let accounts = [account1, account2, account3, account4, account5];
+let account;
+let sortedTransactions = false
 
 // =========================================== Elements
 
@@ -66,9 +69,6 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const enterText = 'Войдите в свой аккаунт'
-let account;
-
 // =========================================== Functions
 
 
@@ -79,13 +79,13 @@ const displayTransactions = (transactions) => {
       const transTypeClass = trans > 0 ? 'deposit' : 'withdrawal'
       const transTypeString = trans > 0 ? 'депозит' : 'вывод средств'
       const transactionRow = `
-      <div class="transactions__row">
-          <div class="transactions__type transactions__type--${transTypeClass}">
-            ${++i} ${transTypeString}
-          </div>
-          <div class="transactions__value transactions__value_${transTypeClass}">${Math.abs(trans)}$</div>
-        </div>
-      `
+         <div class="transactions__row">
+             <div class="transactions__type transactions__type--${transTypeClass}">
+               ${++i} ${transTypeString}
+             </div>
+             <div class="transactions__value transactions__value_${transTypeClass}">${Math.abs(trans)}$</div>
+           </div>
+         `
 
       containerTransactions.insertAdjacentHTML('afterbegin', transactionRow)
    })
@@ -174,8 +174,7 @@ const transferToAccount = () => {
 const closeAccount = () => {
    const { nickname, pin } = account
    if (inputCloseUsername.value.trim() === nickname && +inputClosePin.value === pin) {
-      const deleteAccountIndex = accounts.findIndex(obj => obj.nickname === nickname && obj.pin === pin)
-      accounts.splice(deleteAccountIndex, 1)
+      accounts = accounts.filter(obj => obj !== account)
       displayUI()
    }
    resetData(inputCloseUsername, inputClosePin)
@@ -188,6 +187,12 @@ const addLoan = () => {
       displayAccount()
    }
    resetData(inputLoanAmount, inputLoanAmount)
+}
+
+const sortTransactions = (transactions) => {
+   sortedTransactions = !sortedTransactions
+   const transacs = sortedTransactions ? transactions.slice().sort((a, b) => a - b) : transactions
+   displayTransactions(transacs)
 }
 
 // =========================================== Code
@@ -206,7 +211,6 @@ btnTransfer.addEventListener('click', (e) => {
    transferToAccount()
 })
 
-
 btnClose.addEventListener('click', (e) => {
    e.preventDefault()
    closeAccount()
@@ -217,6 +221,10 @@ btnLoan.addEventListener('click', (e) => {
    addLoan()
 })
 
+btnSort.addEventListener('click', (e) => {
+   e.preventDefault()
+   sortTransactions(account.transactions)
+})
 
 
 
