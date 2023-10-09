@@ -70,11 +70,8 @@ const account4 = {
       '2020-11-15T10:45:23.907Z',
       '2021-01-22T12:17:46.255Z',
       '2021-02-12T15:14:06.486Z',
-      '2021-03-09T11:42:26.371Z',
-      '2021-05-21T07:43:59.331Z',
-      '2021-06-22T15:21:20.814Z',
    ],
-   currency: 'EUR',
+   currency: 'CAD',
    locale: 'fr-CA',
 };
 
@@ -89,9 +86,6 @@ const account5 = {
       '2020-11-15T10:45:23.907Z',
       '2021-01-22T12:17:46.255Z',
       '2021-02-12T15:14:06.486Z',
-      '2021-03-09T11:42:26.371Z',
-      '2021-05-21T07:43:59.331Z',
-      '2021-06-22T15:21:20.814Z',
    ],
    currency: 'USD',
    locale: 'en-US',
@@ -136,6 +130,7 @@ const displayTransactions = (transactions) => {
    containerTransactions.innerHTML = ''
 
    transactions.forEach((trans, i) => {
+      const date = displayDate(account.transactionsDates[i])
       const transTypeClass = trans > 0 ? 'deposit' : 'withdrawal'
       const transTypeString = trans > 0 ? 'депозит' : 'вывод средств'
       const transactionRow = `
@@ -143,7 +138,8 @@ const displayTransactions = (transactions) => {
              <div class="transactions__type transactions__type--${transTypeClass}">
                ${++i} ${transTypeString}
              </div>
-             <div class="transactions__value transactions__value_${transTypeClass}">${Math.abs(trans)}$</div>
+             <div class="transactions__date">${date}</div>
+             <div class="transactions__value transactions__value_${transTypeClass}">${transactionsCurrency(trans)}</div>
            </div>
          `
 
@@ -153,8 +149,9 @@ const displayTransactions = (transactions) => {
 
 const displayBalance = (transactions) => {
    const balance = transactions.reduce((sum, trans) => sum += trans, 0)
-   labelBalance.textContent = `${balance}$`
+   labelBalance.textContent = `${transactionsCurrency(balance)}`
    account.balance = balance
+   labelDate.textContent = displayDate()
 }
 
 const displayTotalValue = (transactions, interest) => {
@@ -168,9 +165,9 @@ const displayTotalValue = (transactions, interest) => {
       .reduce((sum, int) => sum + int, 0)
 
 
-   labelSumIn.textContent = depositTotal + '$'
-   labelSumOut.textContent = Math.abs(withdrawalTotal) + '$'
-   labelSumInterest.textContent = interestTotal + '$'
+   labelSumIn.textContent = transactionsCurrency(depositTotal)
+   labelSumOut.textContent = transactionsCurrency(withdrawalTotal)
+   labelSumInterest.textContent = transactionsCurrency(interestTotal)
 }
 
 const displayUI = (text = enterText, opacity = 0) => {
@@ -224,6 +221,8 @@ const transferToAccount = () => {
       && accForTransfer.nickname !== account.nickname) {
       accForTransfer.transactions.push(+inputTransferAmount.value)
       account.transactions.push(-(+inputTransferAmount.value))
+      account.transactionsDates.push(new Date().toISOString())
+      accForTransfer.transactionsDates.push(new Date().toISOString())
       displayAccount()
 
 
@@ -244,6 +243,7 @@ const addLoan = () => {
    const loanAmount = +inputLoanAmount.value
    if (loanAmount > 0 && account.transactions.some(trans => trans >= (loanAmount * 10) / 100)) {
       account.transactions.push(loanAmount)
+      account.transactionsDates.push(new Date().toISOString())
       displayAccount()
    }
    resetData(inputLoanAmount, inputLoanAmount)
@@ -254,6 +254,39 @@ const sortTransactions = (transactions) => {
    const transacs = sortedTransactions ? transactions.slice().sort((a, b) => a - b) : transactions
    displayTransactions(transacs)
 }
+
+const displayDate = (arg) => {
+   const options = {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+   }
+
+   if (arg) {
+      const date = new Date(arg)
+      const variance = dateBetweenDays(new Date, date)
+
+      if (variance <= 1) return 'Сегодня'
+      if (variance === 2) return 'Вчера'
+      if (variance < 5) return `${variance} дня назад`
+
+      return new Intl.DateTimeFormat(account.locale, options).format(date)
+   }
+
+   return new Intl.DateTimeFormat(account.locale, options).format(new Date())
+
+}
+
+const transactionsCurrency = (trans) => {
+   const options = {
+      style: 'currency',
+      currency: account.currency
+   }
+
+   return new Intl.NumberFormat(account.locale, options).format(trans)
+}
+
+const dateBetweenDays = (date1, date2) => Math.trunc(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24))
 
 // =========================================== Code
 
