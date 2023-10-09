@@ -95,6 +95,7 @@ const enterText = 'Войдите в свой аккаунт'
 let accounts = [account1, account2, account3, account4, account5];
 let account;
 let sortedTransactions = false
+let timer;
 
 // =========================================== Elements
 
@@ -242,9 +243,12 @@ const closeAccount = () => {
 const addLoan = () => {
    const loanAmount = +inputLoanAmount.value
    if (loanAmount > 0 && account.transactions.some(trans => trans >= (loanAmount * 10) / 100)) {
-      account.transactions.push(loanAmount)
-      account.transactionsDates.push(new Date().toISOString())
-      displayAccount()
+      setTimeout(() => {
+         account.transactions.push(loanAmount)
+         account.transactionsDates.push(new Date().toISOString())
+         displayAccount()
+      }, 5000)
+
    }
    resetData(inputLoanAmount, inputLoanAmount)
 }
@@ -286,6 +290,31 @@ const transactionsCurrency = (trans) => {
    return new Intl.NumberFormat(account.locale, options).format(trans)
 }
 
+const startLogoutTimer = () => {
+   let time = 300
+
+   timer = setInterval(() => {
+      --time
+
+      const min = `${Math.trunc(time / 60)}`.padStart(2, '0')
+      const sec = `${time % 60}`.padStart(2, '0')
+
+
+      labelTimer.textContent = `${min}:${sec}`
+      if (time === 0) {
+         clearInterval(timer)
+         displayUI()
+         account = null
+      }
+
+   }, 1000)
+}
+
+const resetTimer = () => {
+   clearInterval(timer)
+   startLogoutTimer()
+}
+
 const dateBetweenDays = (date1, date2) => Math.trunc(Math.abs(date1 - date2) / (1000 * 60 * 60 * 24))
 
 // =========================================== Code
@@ -297,11 +326,14 @@ createNicknames(accounts)
 btnLogin.addEventListener('click', (e) => {
    e.preventDefault()
    displayUserAccount()
+   if (timer) clearInterval(timer)
+   startLogoutTimer()
 })
 
 btnTransfer.addEventListener('click', (e) => {
    e.preventDefault()
    transferToAccount()
+   resetTimer()
 })
 
 btnClose.addEventListener('click', (e) => {
@@ -312,11 +344,13 @@ btnClose.addEventListener('click', (e) => {
 btnLoan.addEventListener('click', (e) => {
    e.preventDefault()
    addLoan()
+   resetTimer()
 })
 
 btnSort.addEventListener('click', (e) => {
    e.preventDefault()
    sortTransactions(account.transactions)
+   resetTimer()
 })
 
 
